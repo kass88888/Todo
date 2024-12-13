@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDoリストアプリ</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4, #fbc2eb);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        #app {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #4A4A4A;
+            font-weight: 600;
+        }
+
+        #new-task-form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        #new-task-form input[type="text"], #new-task-form select, #new-task-form input[type="date"] {
+            flex: 2;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        #new-task-form input[type="text"]:focus, #new-task-form select:focus, #new-task-form input[type="date"]:focus {
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+            border-color: #007BFF;
+        }
+
+        #new-task-form button {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        #new-task-form button:hover {
+            background-color: #0056b3;
+            box-shadow: 0 6px 15px rgba(0, 123, 255, 0.5);
+        }
+
+        #tasks {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        #tasks li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f4f4f4;
+            padding: 14px 20px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        #tasks li:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        #tasks li .task-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #tasks li .task-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        #tasks li .due-date {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #777;
+        }
+
+        #tasks li .delete-btn, #tasks li .complete-btn {
+            background-color: #FF4136;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        #tasks li .complete-btn {
+            background-color: #28a745;
+            margin-right: 8px;
+        }
+
+        #tasks li .complete-btn:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
+
+        #tasks li .delete-btn:hover {
+            background-color: #e60000;
+            transform: scale(1.05);
+        }
+
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>ToDoリスト</h1>
+        <form id="new-task-form">
+            <input type="text" id="new-task-input" placeholder="新しいタスクを追加..." required>
+            <select id="task-priority">
+                <option value="Low">低</option>
+                <option value="Medium">中</option>
+                <option value="High">高</option>
+            </select>
+            <input type="date" id="new-task-date" required>
+            <button type="submit">追加</button>
+        </form>
+        <ul id="tasks"></ul>
+        <footer>タスクを効率よく管理しましょう！</footer>
+    </div>
+    <script>
+        document.getElementById('new-task-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const taskInput = document.getElementById('new-task-input');
+            const taskDate = document.getElementById('new-task-date');
+            const taskPriority = document.getElementById('task-priority');
+
+            const taskText = taskInput.value.trim();
+            const dueDate = taskDate.value;
+            const priority = taskPriority.value;
+
+            if (taskText === '' || dueDate === '') return;
+
+            const taskItem = document.createElement('li');
+            taskItem.innerHTML = `
+                <div class="task-details">
+                    <span class="task-name">${taskText}</span>
+                    <span class="due-date">締め切り: ${dueDate} | 優先度: ${priority}</span>
+                </div>
+                <div>
+                    <button class="complete-btn">完了</button>
+                    <button class="delete-btn">削除</button>
+                </div>
+            `;
+
+            document.getElementById('tasks').appendChild(taskItem);
+
+            taskItem.querySelector('.delete-btn').addEventListener('click', function() {
+                taskItem.remove();
+                saveTasks();
+            });
+
+            taskItem.querySelector('.complete-btn').addEventListener('click', function() {
+                taskItem.classList.toggle('completed');
+                saveTasks();
+            });
+
+            saveTasks();
+
+            taskInput.value = '';
+            taskDate.value = '';
+            taskPriority.value = 'Low';
+        });
+
+        function saveTasks() {
+            const tasks = Array.from(document.querySelectorAll('#tasks li')).map(taskItem => {
+                const taskName = taskItem.querySelector('.task-name').textContent;
+                const dueDate = taskItem.querySelector('.due-date').textContent.split(' | ')[0].replace('締め切り: ', '');
+                const priority = taskItem.querySelector('.due-date').textContent.split(' | ')[1].replace('優先度: ', '');
+                const completed = taskItem.classList.contains('completed');
+                return { taskName, dueDate, priority, completed };
+            });
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        function loadTasks() {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks.forEach(({ taskName, dueDate, priority, completed }) => {
+                const taskItem = document.createElement('li');
+                taskItem.innerHTML = `
+                    <div class="task-details">
+                        <span class="task-name">${taskName}</span>
+                        <span class="due-date">締め切り: ${dueDate} | 優先度: ${priority}</span>
+                    </div>
+                    <div>
+                        <button class="complete-btn">完了</button>
+                        <button class="delete-btn">削除</button>
+                    </div>
+                `;
+                if (completed) taskItem.classList.add('completed');
+
+                document.getElementById('tasks').appendChild(taskItem);
+
+                taskItem.querySelector('.delete-btn').addEventListener('click', function() {
+                    taskItem.remove();
+                    saveTasks();
+                });
+
+                taskItem.querySelector('.complete-btn').addEventListener('click', function() {
+                    taskItem.classList.toggle('completed');
+                    saveTasks();
+                });
+            });
+        }
+
+        loadTasks();
+    </script>
+</body>
+</html>
